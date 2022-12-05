@@ -12,7 +12,7 @@ export const handler = middy(
     const signedUrl = await generateUploadUrl(todoId);
 
     return {
-      statusCode: 200,
+      statusCode: 201,
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Credentials': true
