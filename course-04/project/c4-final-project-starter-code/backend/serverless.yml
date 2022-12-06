@@ -1,7 +1,7 @@
 # TODO: Change the name of the org
 org: zyzornatti
-app: serverless-todo-app
-service: serverless-todo-app
+app: udacity-project4
+service: udacity-project4
 frameworkVersion: '3.25.1'
 
 plugins:
@@ -12,10 +12,9 @@ plugins:
 provider:
   name: aws
   runtime: nodejs12.x
-  # lambdaHashingVersion: '20201221'
 
-  stage: ${opt:stage, 'dev'}
-  region: ${opt:region, 'us-east-2'}
+  stage: ${opt:stage, 'prod'}
+  region: ${opt:region, 'us-east-1'}
 
   tracing:
     lambda: true
@@ -24,11 +23,11 @@ provider:
   # Use these variables in the functions and resouorces section below. For example,
   # ${self:provider.environment.ATTACHMENT_S3_BUCKET}
   environment:
-    PROJECT_NAME: serverless-todo-app
+    PROJECT_NAME: udacity-project4
     TODOS_TABLE_INDEX: ${self:provider.environment.TODOS_CREATED_AT_INDEX}
-    TODOS_TABLE: serverless-todo-app-${self:provider.stage}
+    TODOS_TABLE: udacity-project4-${self:provider.stage}
     TODOS_CREATED_AT_INDEX: CreatedAtIndex
-    ATTACHMENT_S3_BUCKET: serverless-todo-app-images-uda4s3-${self:provider.stage}
+    ATTACHMENT_S3_BUCKET: udacity-project4-images-uda4s3-${self:provider.stage}
     SIGNED_URL_EXPIRATION: 300
 
   logs:
@@ -166,14 +165,13 @@ functions:
       - Effect: Allow
         Action:
           - dynamodb:Query
-          - dynamodb:PutItem
+          - dynamodb:UpdateItem
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
       - Effect: Allow
         Action:
           - xray:PutTraceSegments
         Resource:
           - '*'
-
 resources:
   Resources:
     # Add necessary AWS resources. You will need at least the following AWS resources
@@ -185,8 +183,19 @@ resources:
         ResponseParameters:
           gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
           gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-          gatewayresponse.header.Access-Control-Allow-Methods: "'GET,OPTIONS,POST'"
+          gatewayresponse.header.Access-Control-Allow-Methods: "'GET,OPTIONS,POST,DELETE,PATCH,PUT'"
         ResponseType: DEFAULT_4XX
+        RestApiId:
+          Ref: ApiGatewayRestApi
+
+    GatewayResponseDefault5XX:
+      Type: AWS::ApiGateway::GatewayResponse
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+          gatewayresponse.header.Access-Control-Allow-Methods: "'GET,OPTIONS,POST,DELETE,PATCH,PUT'"
+        ResponseType: DEFAULT_5XX
         RestApiId:
           Ref: ApiGatewayRestApi
 
@@ -237,7 +246,7 @@ resources:
                 - DELETE
                 - HEAD
               MaxAge: 300
-
+              
     # TODO: Complete the policy below and attach it to the bucket defined above
     # For cross referencing the name of the bucket, use "!Ref AttachmentsBucket"
     BucketPolicy:

@@ -14,6 +14,10 @@ export const handler = middy(
     const todoItem = await createTodo(newTodo, userId)
     return {
       statusCode: 201,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': true,
+      },
       body: JSON.stringify({
         item: todoItem
       })
