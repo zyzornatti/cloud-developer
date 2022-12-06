@@ -1,7 +1,7 @@
 # TODO: Change the name of the org
 org: zyzornatti
-app: udacity-project4
-service: udacity-project4
+app: udacity-projectt4
+service: udacity-projectt4
 frameworkVersion: '3.25.1'
 
 plugins:
@@ -13,8 +13,8 @@ provider:
   name: aws
   runtime: nodejs12.x
 
-  stage: ${opt:stage, 'prod'}
-  region: ${opt:region, 'us-east-1'}
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'us-east-2'}
 
   tracing:
     lambda: true
@@ -23,9 +23,9 @@ provider:
   # Use these variables in the functions and resouorces section below. For example,
   # ${self:provider.environment.ATTACHMENT_S3_BUCKET}
   environment:
-    PROJECT_NAME: udacity-project4
+    PROJECT_NAME: udacity-projectt4
     TODOS_TABLE_INDEX: ${self:provider.environment.TODOS_CREATED_AT_INDEX}
-    TODOS_TABLE: udacity-project4-${self:provider.stage}
+    TODOS_TABLE: udacity-project4t-${self:provider.stage}
     TODOS_CREATED_AT_INDEX: CreatedAtIndex
     ATTACHMENT_S3_BUCKET: udacity-project4-images-uda4s3-${self:provider.stage}
     SIGNED_URL_EXPIRATION: 300
@@ -161,17 +161,14 @@ functions:
       - Effect: Allow
         Action:
           - s3:*
+          - xray:PutTraceSegments          
         Resource: arn:aws:s3:::${self:provider.environment.ATTACHMENT_S3_BUCKET}/*
       - Effect: Allow
         Action:
           - dynamodb:Query
           - dynamodb:UpdateItem
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
-      - Effect: Allow
-        Action:
-          - xray:PutTraceSegments
-        Resource:
-          - '*'
+
 resources:
   Resources:
     # Add necessary AWS resources. You will need at least the following AWS resources
